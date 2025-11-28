@@ -121,15 +121,7 @@ function generateEmailHTML({ location, description, images, formattedDate }) {
             </td>
           </tr>
 
-          <!-- Image Section -->
-          <tr>
-            <td style="padding: 20px; background-color: #ffffff;">
-              <h2 style="margin: 0 0 15px 0; color: #212529; font-size: 18px; font-weight: 600;">📸 Muammo rasmlari (${images.length})</h2>
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                ${imagesHTML}
-              </table>
-            </td>
-          </tr>
+        
 
           <!-- Description Section -->
           <tr>
