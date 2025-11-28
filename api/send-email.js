@@ -36,12 +36,24 @@ export default async function handler(req, res) {
       formattedDate,
     });
 
-    // Send email via Resend
+    // Extract base64 data and mime type from data URL
+    const base64Match = imageBase64.match(/^data:([^;]+);base64,(.+)$/);
+    const mimeType = base64Match ? base64Match[1] : 'image/jpeg';
+    const base64Data = base64Match ? base64Match[2] : imageBase64;
+
+    // Send email via Resend with attachment
     const data = await resend.emails.send({
       from: "Muammo Xabarlari <onboarding@resend.dev>", // Default Resend email
       to: [process.env.RECIPIENT_EMAIL || "yokubjanovich@gmail.com"],
       subject: subject,
       html: htmlContent,
+      attachments: [
+        {
+          filename: "muammo.jpg",
+          content: Buffer.from(base64Data, "base64"),
+          content_id: "muammo-image",
+        },
+      ],
     });
 
     return res.status(200).json({
@@ -120,7 +132,7 @@ function generateEmailHTML({
               <table width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td align="center" style="padding: 10px; background-color: #f8f9fa; border-radius: 8px;">
-                    <img src="${imageBase64}" alt="Muammo rasmi" style="max-width: 100%; height: auto; border-radius: 4px; display: block;" />
+                    <img src="cid:muammo-image" alt="Muammo rasmi" style="max-width: 100%; height: auto; border-radius: 4px; display: block;" />
                   </td>
                 </tr>
               </table>
