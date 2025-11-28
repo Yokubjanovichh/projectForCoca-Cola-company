@@ -109,6 +109,7 @@ export function ImageUploader({ value, onChange, error }) {
       maxSize={5 * 1024 * 1024}
       maxFiles={5}
       multiple
+      activateOnClick={true}
       style={{
         minHeight: rem(220),
         cursor: "pointer",
