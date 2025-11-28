@@ -1,0 +1,36 @@
+{
+  "name": "industrial-issue-reporter",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0"
+  },
+  "dependencies": {
+    "@mantine/core": "^7.13.2",
+    "@mantine/dropzone": "^7.13.2",
+    "@mantine/form": "^7.13.2",
+    "@mantine/hooks": "^7.13.2",
+    "@mantine/notifications": "^7.13.2",
+    "@tabler/icons-react": "^3.19.0",
+    "browser-image-compression": "^2.0.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "resend": "^4.8.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "eslint": "^8.57.1",
+    "eslint-plugin-react": "^7.37.1",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.13",
+    "vite": "^5.4.10",
+    "vite-plugin-compression": "^0.5.1"
+  }
+}

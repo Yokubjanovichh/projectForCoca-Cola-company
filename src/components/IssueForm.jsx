@@ -1,0 +1,250 @@
+import { useState } from "react";
+import {
+  Paper,
+  Title,
+  Stack,
+  Select,
+  Textarea,
+  Button,
+  Text,
+  Group,
+  LoadingOverlay,
+} from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
+import { IconSend, IconMapPin, IconFileDescription } from "@tabler/icons-react";
+import { ImageUploader } from "./ImageUploader";
+import { SuccessModal } from "./SuccessModal";
+import { sendIssueReport } from "../services/emailService";
+import { validateFormData } from "../utils/validators";
+
+const LOCATIONS = [
+  { value: "Zavod", label: "🏭 Zavod" },
+  { value: "Sklad", label: "📦 Sklad" },
+];
+
+export function IssueForm() {
+  const [loading, setLoading] = useState(false);
+  const [successModalOpened, setSuccessModalOpened] = useState(false);
+
+  const form = useForm({
+    initialValues: {
+      image: null,
+      location: "",
+      description: "",
+    },
+    validate: {
+      image: (value) => {
+        if (!value) return "Iltimos rasm yuklang";
+        if (value.size > 5 * 1024 * 1024)
+          return "Fayl hajmi juda katta (maksimal 5MB)";
+        return null;
+      },
+      location: (value) => (!value ? "Iltimos joyni tanlang" : null),
+      description: (value) => {
+        if (!value || value.trim().length < 10) {
+          return "Tavsif kamida 10 ta belgidan iborat bo'lishi kerak";
+        }
+        if (value.length > 1000) {
+          return "Tavsif 1000 ta belgidan oshmasligi kerak";
+        }
+        return null;
+      },
+    },
+  });
+
+  const handleSubmit = async (values) => {
+    // Validate form data with Zod
+    const validation = validateFormData(values);
+
+    if (!validation.success) {
+      Object.entries(validation.errors).forEach(([field, message]) => {
+        form.setFieldError(field, message);
+      });
+      notifications.show({
+        title: "Xatolik",
+        message: "Iltimos formani tekshirib qayta urinib ko'ring",
+        color: "red",
+        position: "top-right",
+      });
+      return;
+    }
+
+    // Check internet connection
+    if (!navigator.onLine) {
+      notifications.show({
+        title: "Internet aloqasi yo'q",
+        message: "Iltimos internetni tekshirib qayta urinib ko'ring",
+        color: "orange",
+        position: "top-right",
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const result = await sendIssueReport(validation.data);
+
+      if (result.success) {
+        setSuccessModalOpened(true);
+        form.reset();
+        notifications.show({
+          title: "Muvaffaqiyatli",
+          message: result.message,
+          color: "green",
+          position: "top-right",
+        });
+      } else {
+        notifications.show({
+          title: "Xatolik",
+          message: result.error,
+          color: "red",
+          position: "top-right",
+          autoClose: 5000,
+        });
+      }
+    } catch (error) {
+      notifications.show({
+        title: "Xatolik",
+        message: "Kutilmagan xatolik yuz berdi. Iltimos qayta urinib ko'ring.",
+        color: "red",
+        position: "top-right",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSendAnother = () => {
+    setSuccessModalOpened(false);
+    form.reset();
+  };
+
+  const characterCount = form.values.description.length;
+  const characterLimit = 1000;
+
+  return (
+    <>
+      <Paper
+        shadow="none"
+        radius={0}
+        p={{ base: "md", sm: "xl" }}
+        style={{
+          position: "relative",
+          width: "100%",
+          maxWidth: "450px",
+          height: "100%",
+          backgroundColor: "white",
+          overflow: "auto",
+          margin: "0 auto",
+        }}
+      >
+        <LoadingOverlay
+          visible={loading}
+          zIndex={1000}
+          overlayProps={{ radius: "lg", blur: 2 }}
+          loaderProps={{ type: "bars" }}
+        />
+
+        <Stack gap="lg">
+          <div>
+            <Title order={1} size="h2" mb="xs">
+              🏭 Muammo haqida xabar berish
+            </Title>
+          </div>
+
+          <form onSubmit={form.onSubmit(handleSubmit)}>
+            <Stack gap="md">
+              {/* Image Upload */}
+              <div>
+                <ImageUploader
+                  value={form.values.image}
+                  onChange={(file) => form.setFieldValue("image", file)}
+                  error={form.errors.image}
+                />
+                {form.errors.image && (
+                  <Text size="xs" c="red" mt={5}>
+                    {form.errors.image}
+                  </Text>
+                )}
+              </div>
+
+              {/* Location Select */}
+              <Select
+                placeholder="Muammo qayerda yuz berganini tanlang"
+                data={LOCATIONS}
+                leftSection={<IconMapPin size={16} />}
+                required
+                size="md"
+                {...form.getInputProps("location")}
+                styles={{
+                  input: {
+                    minHeight: 44,
+                  },
+                }}
+              />
+
+              {/* Description Textarea */}
+              <div>
+                <Textarea
+                  placeholder="Muammoni batafsil tasvirlab bering..."
+                  required
+                  autosize
+                  minRows={4}
+                  maxRows={8}
+                  size="md"
+                  leftSection={<IconFileDescription size={16} />}
+                  {...form.getInputProps("description")}
+                  styles={{
+                    input: {
+                      fontSize: 16,
+                    },
+                  }}
+                />
+                <Group justify="space-between" mt={5}>
+                  {form.errors.description && (
+                    <Text size="xs" c="red">
+                      {form.errors.description}
+                    </Text>
+                  )}
+                  <Text
+                    size="xs"
+                    c={characterCount > characterLimit ? "red" : "dimmed"}
+                    ml="auto"
+                  >
+                    {characterCount}/{characterLimit}
+                  </Text>
+                </Group>
+              </div>
+
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                size="lg"
+                fullWidth
+                leftSection={<IconSend size={20} />}
+                loading={loading}
+                disabled={loading}
+                mt="md"
+                styles={{
+                  root: {
+                    minHeight: 50,
+                  },
+                }}
+              >
+                Xabar yuborish
+              </Button>
+            </Stack>
+          </form>
+        </Stack>
+      </Paper>
+
+      <SuccessModal
+        opened={successModalOpened}
+        onClose={() => setSuccessModalOpened(false)}
+        onSendAnother={handleSendAnother}
+      />
+    </>
+  );
+}
