@@ -46,8 +46,6 @@ export function IssueForm() {
       image: (value) => {
         if (!value || value.length === 0)
           return "Iltimos kamida 1 ta rasm yuklang";
-        if (value.some((file) => file.size > 5 * 1024 * 1024))
-          return "Ba'zi rasmlar juda katta (maksimal 5MB)";
         return null;
       },
       location: (value) => (!value ? "Iltimos joyni tanlang" : null),

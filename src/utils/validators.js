@@ -8,13 +8,10 @@ export const issueFormSchema = z.object({
     .array(z.instanceof(File))
     .min(1, { message: "Iltimos kamida 1 ta rasm yuklang" })
     .max(5, { message: "Maksimal 5 ta rasm yuklash mumkin" })
-    .refine((files) => files.every((file) => file.size <= 5 * 1024 * 1024), {
-      message: "Har bir rasm 5MB dan kam bo'lishi kerak",
-    })
     .refine(
       (files) =>
         files.every((file) =>
-          ["image/jpeg", "image/png", "image/webp"].includes(file.type)
+          ["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(file.type)
         ),
       {
         message: "Faqat JPG, PNG va WebP rasmlar qo'llab-quvvatlanadi",

@@ -161,7 +161,7 @@ export function ImageUploader({ value, onChange, error }) {
                   Rasmlarni tanlash uchun bosing
                 </Text>
                 <Text size="sm" c="dimmed" inline mt={7} ta="center">
-                  Muammo rasmlarini yuklang (maksimal 5 ta, har biri 5MB)
+                  Muammo rasmlarini yuklang (maksimal 5 ta)
                 </Text>
                 <Text size="xs" c="dimmed" inline mt={4} ta="center">
                   📸 Kamera yoki 🖼️ Galeriyadan
