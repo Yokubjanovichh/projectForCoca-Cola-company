@@ -11,26 +11,30 @@ import {
   Button,
   SimpleGrid,
   Box,
+  FileButton,
 } from "@mantine/core";
-import { IconUpload, IconPhoto, IconX } from "@tabler/icons-react";
+import { IconUpload, IconPhoto, IconX, IconCamera } from "@tabler/icons-react";
 
 export function ImageUploader({ value, onChange, error }) {
   const [previews, setPreviews] = useState([]);
   const openRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const handleDrop = (files) => {
     const currentFiles = Array.isArray(value) ? value : [];
-    const newFiles = [...currentFiles, ...files].slice(0, 5); // Max 5 rasmlar
+    const remainingSlots = 5 - currentFiles.length;
+    const filesToAdd = files.slice(0, remainingSlots);
+    const newFiles = [...currentFiles, ...filesToAdd];
     onChange(newFiles);
 
-    // Create previews
-    const newPreviews = [];
+    // Create previews for all files
+    const allPreviews = [];
     newFiles.forEach((file) => {
       const reader = new FileReader();
       reader.onload = (e) => {
-        newPreviews.push({ file, preview: e.target.result });
-        if (newPreviews.length === newFiles.length) {
-          setPreviews(newPreviews);
+        allPreviews.push({ file, preview: e.target.result });
+        if (allPreviews.length === newFiles.length) {
+          setPreviews(allPreviews);
         }
       };
       reader.readAsDataURL(file);
@@ -88,86 +92,78 @@ export function ImageUploader({ value, onChange, error }) {
         </SimpleGrid>
 
         {previews.length < 5 && (
-          <Button
-            variant="light"
-            leftSection={<IconPhoto size={16} />}
-            onClick={() => openRef.current?.()}
-            fullWidth
+          <FileButton
+            ref={fileInputRef}
+            onChange={handleDrop}
+            accept="image/*"
+            multiple
           >
-            Yana rasm qo'shish ({previews.length}/5)
-          </Button>
+            {(props) => (
+              <Button
+                {...props}
+                variant="light"
+                leftSection={<IconCamera size={16} />}
+                fullWidth
+              >
+                Yana rasm qo'shish ({previews.length}/5)
+              </Button>
+            )}
+          </FileButton>
         )}
       </Stack>
     );
   }
 
   return (
-    <Dropzone
-      openRef={openRef}
-      onDrop={handleDrop}
-      radius="md"
-      accept={IMAGE_MIME_TYPE}
-      maxSize={5 * 1024 * 1024}
-      maxFiles={5}
-      multiple
-      activateOnClick={true}
-      style={{
-        minHeight: rem(220),
-        cursor: "pointer",
-        borderColor: error ? "var(--mantine-color-red-6)" : undefined,
-      }}
-    >
-      <Stack
-        align="center"
-        justify="center"
-        gap="md"
-        style={{ minHeight: rem(200), pointerEvents: "none" }}
+    <>
+      <FileButton
+        ref={openRef}
+        onChange={handleDrop}
+        accept="image/*"
+        multiple
       >
-        <Dropzone.Accept>
-          <IconUpload
+        {(props) => (
+          <Paper
+            {...props}
+            p="lg"
+            radius="md"
+            withBorder
             style={{
-              width: rem(52),
-              height: rem(52),
-              color: "var(--mantine-color-blue-6)",
+              cursor: "pointer",
+              borderColor: error ? "var(--mantine-color-red-6)" : undefined,
+              borderStyle: "dashed",
+              borderWidth: 2,
+              minHeight: rem(220),
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
-            stroke={1.5}
-          />
-        </Dropzone.Accept>
+          >
+            <Stack align="center" justify="center" gap="md">
+              <IconCamera
+                style={{
+                  width: rem(52),
+                  height: rem(52),
+                  color: "var(--mantine-color-blue-6)",
+                }}
+                stroke={1.5}
+              />
 
-        <Dropzone.Reject>
-          <IconX
-            style={{
-              width: rem(52),
-              height: rem(52),
-              color: "var(--mantine-color-red-6)",
-            }}
-            stroke={1.5}
-          />
-        </Dropzone.Reject>
-
-        <Dropzone.Idle>
-          <IconPhoto
-            style={{
-              width: rem(52),
-              height: rem(52),
-              color: "var(--mantine-color-dimmed)",
-            }}
-            stroke={1.5}
-          />
-        </Dropzone.Idle>
-
-        <div>
-          <Text size="xl" inline ta="center" fw={500}>
-            Rasmlarni bu yerga torting yoki tanlash uchun bosing
-          </Text>
-          <Text size="sm" c="dimmed" inline mt={7} ta="center">
-            Muammo rasmlarini yuklang (maksimal 5 ta, har biri 5MB)
-          </Text>
-          <Text size="xs" c="dimmed" inline mt={4} ta="center">
-            Qo'llab-quvvatlanadi: JPG, PNG, WebP
-          </Text>
-        </div>
-      </Stack>
-    </Dropzone>
+              <div>
+                <Text size="xl" inline ta="center" fw={500}>
+                  Rasmlarni tanlash uchun bosing
+                </Text>
+                <Text size="sm" c="dimmed" inline mt={7} ta="center">
+                  Muammo rasmlarini yuklang (maksimal 5 ta, har biri 5MB)
+                </Text>
+                <Text size="xs" c="dimmed" inline mt={4} ta="center">
+                  📸 Kamera yoki 🖼️ Galeriyadan
+                </Text>
+              </div>
+            </Stack>
+          </Paper>
+        )}
+      </FileButton>
+    </>
   );
 }
