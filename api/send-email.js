@@ -81,7 +81,7 @@ function generateEmailHTML({
   const imagesHTML = images.map((_, index) => `
     <tr>
       <td align="center" style="padding: 10px; background-color: #f8f9fa; border-radius: 8px; margin-bottom: 10px;">
-        <img src="cid:muammo-image-${index}" alt="Muammo rasmi ${index + 1}" style="max-width: 100%; height: auto; border-radius: 4px; display: block;" />
+        <img src="cid:muammo-image-${index}" alt="Rasmlar fayl bulimiga biriktirlgan" style="max-width: 100%; height: auto; border-radius: 4px; display: block;" />
       </td>
     </tr>
   `).join('');
