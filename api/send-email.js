@@ -40,7 +40,7 @@ export default async function handler(req, res) {
     const attachments = images.map((imageBase64, index) => {
       const base64Match = imageBase64.match(/^data:([^;]+);base64,(.+)$/);
       const base64Data = base64Match ? base64Match[2] : imageBase64;
-      
+
       return {
         filename: `muammo-${index + 1}.jpg`,
         content: Buffer.from(base64Data, "base64"),
@@ -71,21 +71,7 @@ export default async function handler(req, res) {
   }
 }
 
-function generateEmailHTML({
-  location,
-  description,
-  images,
-  formattedDate,
-}) {
-  // Generate image HTML for each image
-  const imagesHTML = images.map((_, index) => `
-    <tr>
-      <td align="center" style="padding: 10px; background-color: #f8f9fa; border-radius: 8px; margin-bottom: 10px;">
-        <img src="cid:muammo-image-${index}" alt="Rasmlar fayl bulimiga biriktirlgan" style="max-width: 100%; height: auto; border-radius: 4px; display: block;" />
-      </td>
-    </tr>
-  `).join('');
-
+function generateEmailHTML({ location, description, images, formattedDate }) {
   return `
 <!DOCTYPE html>
 <html lang="uz">

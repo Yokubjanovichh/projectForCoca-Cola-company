@@ -9,12 +9,12 @@ export async function sendIssueReport(formData) {
   try {
     // Compress all images
     const compressedImages = await Promise.all(
-      formData.image.map(img => compressImage(img))
+      formData.image.map((img) => compressImage(img))
     );
 
     // Convert to base64
     const imagesBase64 = await Promise.all(
-      compressedImages.map(img => imageToBase64(img))
+      compressedImages.map((img) => imageToBase64(img))
     );
 
     // Prepare data for API

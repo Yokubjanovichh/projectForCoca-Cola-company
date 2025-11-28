@@ -82,8 +82,7 @@ export function ImageUploader({ value, onChange, error }) {
             />
 
             <Text size="xs" c="dimmed" mt="xs" ta="center">
-              {value[index]?.name} ({(value[index]?.size / 1024).toFixed(0)}{" "}
-              KB)
+              {value[index]?.name} ({(value[index]?.size / 1024).toFixed(0)} KB)
             </Text>
           </Paper>
         ))}
