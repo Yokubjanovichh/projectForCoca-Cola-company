@@ -9,6 +9,8 @@ import {
   ActionIcon,
   Paper,
   Button,
+  SimpleGrid,
+  Box,
 } from "@mantine/core";
 import { IconUpload, IconPhoto, IconX } from "@tabler/icons-react";
 
@@ -48,50 +50,49 @@ export function ImageUploader({ value, onChange, error }) {
   if (previews.length > 0) {
     return (
       <Stack gap="md">
-        {previews.map((item, index) => (
-          <Paper
-            key={index}
-            p="md"
-            radius="md"
-            withBorder
-            style={{ position: "relative" }}
-          >
-            <ActionIcon
-              color="red"
-              size="lg"
-              radius="xl"
-              variant="filled"
-              onClick={() => handleRemove(index)}
-              style={{
-                position: "absolute",
-                top: 10,
-                right: 10,
-                zIndex: 1,
-              }}
-              aria-label="Rasmni o'chirish"
-            >
-              <IconX size={18} />
-            </ActionIcon>
+        <SimpleGrid cols={2} spacing="xs">
+          {previews.map((item, index) => (
+            <Box key={index} style={{ position: "relative" }}>
+              <ActionIcon
+                color="red"
+                size="sm"
+                radius="xl"
+                variant="filled"
+                onClick={() => handleRemove(index)}
+                style={{
+                  position: "absolute",
+                  top: 5,
+                  right: 5,
+                  zIndex: 1,
+                }}
+                aria-label="Rasmni o'chirish"
+              >
+                <IconX size={14} />
+              </ActionIcon>
 
-            <Image
-              src={item.preview}
-              alt={`Rasm ${index + 1}`}
-              radius="sm"
-              fit="contain"
-              mah={300}
-            />
+              <Image
+                src={item.preview}
+                alt={`Rasm ${index + 1}`}
+                radius="sm"
+                fit="cover"
+                h={120}
+                w="100%"
+                style={{ border: "1px solid #dee2e6" }}
+              />
 
-            <Text size="xs" c="dimmed" mt="xs" ta="center">
-              {value[index]?.name} ({(value[index]?.size / 1024).toFixed(0)} KB)
-            </Text>
-          </Paper>
-        ))}
+              <Text size="xs" c="dimmed" mt={4} ta="center" lineClamp={1}>
+                {value[index]?.name}
+              </Text>
+            </Box>
+          ))}
+        </SimpleGrid>
 
         {previews.length < 5 && (
           <Button
             variant="light"
             leftSection={<IconPhoto size={16} />}
             onClick={() => openRef.current?.()}
+            fullWidth
           >
             Yana rasm qo'shish ({previews.length}/5)
           </Button>
