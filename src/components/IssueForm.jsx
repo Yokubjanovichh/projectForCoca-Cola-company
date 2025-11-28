@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Paper,
   Title,
@@ -9,10 +9,11 @@ import {
   Text,
   Group,
   LoadingOverlay,
+  Alert,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { IconSend, IconMapPin, IconFileDescription } from "@tabler/icons-react";
+import { IconSend, IconMapPin, IconFileDescription, IconExternalLink, IconAlertCircle } from "@tabler/icons-react";
 import { ImageUploader } from "./ImageUploader";
 import { SuccessModal } from "./SuccessModal";
 import { sendIssueReport } from "../services/emailService";
@@ -26,6 +27,14 @@ const LOCATIONS = [
 export function IssueForm() {
   const [loading, setLoading] = useState(false);
   const [successModalOpened, setSuccessModalOpened] = useState(false);
+  const [isTelegramBrowser, setIsTelegramBrowser] = useState(false);
+
+  useEffect(() => {
+    // Detect Telegram in-app browser
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isTelegram = userAgent.includes('Telegram');
+    setIsTelegramBrowser(isTelegram);
+  }, []);
 
   const form = useForm({
     initialValues: {
@@ -125,6 +134,11 @@ export function IssueForm() {
   const characterCount = form.values.description.length;
   const characterLimit = 1000;
 
+  const openInBrowser = () => {
+    const url = window.location.href;
+    window.open(url, '_blank');
+  };
+
   return (
     <>
       <Paper
@@ -154,6 +168,29 @@ export function IssueForm() {
               🏭 Muammo haqida xabar berish
             </Title>
           </div>
+
+          {isTelegramBrowser && (
+            <Alert 
+              icon={<IconAlertCircle size={16} />} 
+              title="Telegram brauzerida ochilgan" 
+              color="blue"
+              variant="light"
+            >
+              <Stack gap="xs">
+                <Text size="sm">
+                  Rasm yuklash uchun saytni tashqi brauzarda oching (Chrome, Safari, Yandex).
+                </Text>
+                <Button
+                  size="xs"
+                  variant="light"
+                  leftSection={<IconExternalLink size={14} />}
+                  onClick={openInBrowser}
+                >
+                  Brauzarda ochish
+                </Button>
+              </Stack>
+            </Alert>
+          )}
 
           <form onSubmit={form.onSubmit(handleSubmit)}>
             <Stack gap="md">
