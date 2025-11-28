@@ -7,17 +7,21 @@ import { compressImage, imageToBase64 } from "../utils/imageCompression";
  */
 export async function sendIssueReport(formData) {
   try {
-    // Compress image
-    const compressedImage = await compressImage(formData.image);
+    // Compress all images
+    const compressedImages = await Promise.all(
+      formData.image.map(img => compressImage(img))
+    );
 
     // Convert to base64
-    const imageBase64 = await imageToBase64(compressedImage);
+    const imagesBase64 = await Promise.all(
+      compressedImages.map(img => imageToBase64(img))
+    );
 
     // Prepare data for API
     const emailData = {
       location: formData.location,
       description: formData.description,
-      imageBase64,
+      images: imagesBase64,
       timestamp: Date.now(),
     };
 

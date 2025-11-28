@@ -10,10 +10,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { location, description, imageBase64, timestamp } = req.body;
+    const { location, description, images, timestamp } = req.body;
 
     // Validate required fields
-    if (!location || !description || !imageBase64) {
+    if (!location || !description || !images || !Array.isArray(images)) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
@@ -32,28 +32,29 @@ export default async function handler(req, res) {
     const htmlContent = generateEmailHTML({
       location,
       description,
-      imageBase64,
+      images,
       formattedDate,
     });
 
-    // Extract base64 data and mime type from data URL
-    const base64Match = imageBase64.match(/^data:([^;]+);base64,(.+)$/);
-    const mimeType = base64Match ? base64Match[1] : 'image/jpeg';
-    const base64Data = base64Match ? base64Match[2] : imageBase64;
+    // Prepare attachments
+    const attachments = images.map((imageBase64, index) => {
+      const base64Match = imageBase64.match(/^data:([^;]+);base64,(.+)$/);
+      const base64Data = base64Match ? base64Match[2] : imageBase64;
+      
+      return {
+        filename: `muammo-${index + 1}.jpg`,
+        content: Buffer.from(base64Data, "base64"),
+        content_id: `muammo-image-${index}`,
+      };
+    });
 
-    // Send email via Resend with attachment
+    // Send email via Resend with attachments
     const data = await resend.emails.send({
-      from: "Muammo Xabarlari <onboarding@resend.dev>", // Default Resend email
+      from: "Muammo Xabarlari <onboarding@resend.dev>",
       to: [process.env.RECIPIENT_EMAIL || "yokubjanovich@gmail.com"],
       subject: subject,
       html: htmlContent,
-      attachments: [
-        {
-          filename: "muammo.jpg",
-          content: Buffer.from(base64Data, "base64"),
-          content_id: "muammo-image",
-        },
-      ],
+      attachments: attachments,
     });
 
     return res.status(200).json({
@@ -73,9 +74,18 @@ export default async function handler(req, res) {
 function generateEmailHTML({
   location,
   description,
-  imageBase64,
+  images,
   formattedDate,
 }) {
+  // Generate image HTML for each image
+  const imagesHTML = images.map((_, index) => `
+    <tr>
+      <td align="center" style="padding: 10px; background-color: #f8f9fa; border-radius: 8px; margin-bottom: 10px;">
+        <img src="cid:muammo-image-${index}" alt="Muammo rasmi ${index + 1}" style="max-width: 100%; height: auto; border-radius: 4px; display: block;" />
+      </td>
+    </tr>
+  `).join('');
+
   return `
 <!DOCTYPE html>
 <html lang="uz">
@@ -128,13 +138,9 @@ function generateEmailHTML({
           <!-- Image Section -->
           <tr>
             <td style="padding: 20px; background-color: #ffffff;">
-              <h2 style="margin: 0 0 15px 0; color: #212529; font-size: 18px; font-weight: 600;">📸 Muammo rasmi</h2>
+              <h2 style="margin: 0 0 15px 0; color: #212529; font-size: 18px; font-weight: 600;">📸 Muammo rasmlari (${images.length})</h2>
               <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td align="center" style="padding: 10px; background-color: #f8f9fa; border-radius: 8px;">
-                    <img src="cid:muammo-image" alt="Muammo rasmi" style="max-width: 100%; height: auto; border-radius: 4px; display: block;" />
-                  </td>
-                </tr>
+                ${imagesHTML}
               </table>
             </td>
           </tr>

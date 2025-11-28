@@ -74,7 +74,8 @@ export function ImageUploader({ value, onChange, error }) {
       radius="md"
       accept={IMAGE_MIME_TYPE}
       maxSize={5 * 1024 * 1024}
-      maxFiles={1}
+      maxFiles={5}
+      multiple
       style={{
         minHeight: rem(220),
         cursor: "pointer",
@@ -122,10 +123,10 @@ export function ImageUploader({ value, onChange, error }) {
 
         <div>
           <Text size="xl" inline ta="center" fw={500}>
-            Rasmni bu yerga torting yoki tanlash uchun bosing
+            Rasmlarni bu yerga torting yoki tanlash uchun bosing
           </Text>
           <Text size="sm" c="dimmed" inline mt={7} ta="center">
-            Muammo rasmini yuklang (maksimal 5MB)
+            Muammo rasmlarini yuklang (maksimal 5 ta, har biri 5MB)
           </Text>
           <Text size="xs" c="dimmed" inline mt={4} ta="center">
             Qo'llab-quvvatlanadi: JPG, PNG, WebP
