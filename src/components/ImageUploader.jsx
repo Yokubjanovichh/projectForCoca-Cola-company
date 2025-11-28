@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
 import {
   Group,
@@ -19,6 +19,13 @@ export function ImageUploader({ value, onChange, error }) {
   const [previews, setPreviews] = useState([]);
   const openRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  // Reset previews when value is cleared (form reset)
+  useEffect(() => {
+    if (!value || value.length === 0) {
+      setPreviews([]);
+    }
+  }, [value]);
 
   const handleDrop = (files) => {
     const currentFiles = Array.isArray(value) ? value : [];
