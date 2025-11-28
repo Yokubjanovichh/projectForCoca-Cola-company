@@ -100,44 +100,6 @@ export function ImageUploader({ value, onChange, error }) {
       </Stack>
     );
   }
-    setPreview(null);
-    setPreview(null);
-  };
-
-  if (preview) {
-    return (
-      <Paper p="md" radius="md" withBorder style={{ position: "relative" }}>
-        <ActionIcon
-          color="red"
-          size="lg"
-          radius="xl"
-          variant="filled"
-          onClick={handleRemove}
-          style={{
-            position: "absolute",
-            top: 10,
-            right: 10,
-            zIndex: 1,
-          }}
-          aria-label="Remove image"
-        >
-          <IconX size={18} />
-        </ActionIcon>
-
-        <Image
-          src={preview}
-          alt="Issue preview"
-          radius="sm"
-          fit="contain"
-          mah={300}
-        />
-
-        <Text size="xs" c="dimmed" mt="xs" ta="center">
-          {value?.name} ({(value?.size / 1024).toFixed(0)} KB)
-        </Text>
-      </Paper>
-    );
-  }
 
   return (
     <Dropzone
