@@ -17,12 +17,14 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
+    // Format date with Uzbekistan timezone (UTC+5)
     const formattedDate = new Date(timestamp).toLocaleString("en-GB", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: "Asia/Tashkent",
     });
 
     // Generate subject
